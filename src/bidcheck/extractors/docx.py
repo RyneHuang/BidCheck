@@ -99,25 +99,42 @@ class DocxExtractor(BaseExtractor):
 
             rsids = set()
             ns = '{http://schemas.openxmlformats.org/wordprocessingml/2006/main}'
+            ns_w = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
 
-            # 从文档设置中提取
-            for rsid_elem in root.iter(f'{ns}rsid'):
-                for attr in ['{ns}rsidRoot', '{ns}rsid']:
-                    val = rsid_elem.get(attr)
-                    if val:
-                        rsids.add(val)
-                val = rsid_elem.get(f'{ns}val')
-                if val:
-                    rsids.add(val)
-
-            # 从段落中提取
+            # 从段落属性中提取 rsidR, rsidRPr 等属性
             for p_elem in root.iter(f'{ns}p'):
+                # 段落属性
                 pPr = p_elem.find(f'{ns}pPr')
                 if pPr is not None:
-                    for rsid in pPr.iter(f'{ns}rsid'):
-                        val = rsid.get(f'{ns}val')
+                    # 检查段落属性中的 rsid 属性
+                    for attr_name in ['{http://schemas.openxmlformats.org/wordprocessingml/2006/main}rsidR',
+                                      '{http://schemas.openxmlformats.org/wordprocessingml/2006/main}rsidRPr',
+                                      '{http://schemas.openxmlformats.org/wordprocessingml/2006/main}rsidDel',
+                                      '{http://schemas.openxmlformats.org/wordprocessingml/2006/main}rsidP']:
+                        val = pPr.get(attr_name)
                         if val:
                             rsids.add(val)
+
+            # 从运行 (run) 中提取 rsidR, rsidDel 等属性
+            for r_elem in root.iter(f'{ns}r'):
+                rPr = r_elem.find(f'{ns}rPr')
+                if rPr is not None:
+                    for attr_name in ['{http://schemas.openxmlformats.org/wordprocessingml/2006/main}rsidR',
+                                      '{http://schemas.openxmlformats.org/wordprocessingml/2006/main}rsidRPr']:
+                        val = rPr.get(attr_name)
+                        if val:
+                            rsids.add(val)
+
+            # 从文档设置中提取 (settings.xml)
+            try:
+                settings_content = zf.read('word/settings.xml')
+                settings_root = ET.fromstring(settings_content)
+                for rsid_elem in settings_root.iter(f'{ns}rsid'):
+                    val = rsid_elem.get(f'{ns}val')
+                    if val:
+                        rsids.add(val)
+            except KeyError:
+                pass
 
             meta.rsids = list(rsids)
         except KeyError:
