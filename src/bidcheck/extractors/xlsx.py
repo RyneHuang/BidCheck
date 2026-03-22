@@ -88,13 +88,13 @@ class XlsxExtractor(BaseExtractor):
 
     def _extract_shared_strings(self, meta: FileMeta, zf: ZipFile):
         """提取共享字符串指纹 (关键!)"""
+        strings = []
+        ns = '{http://schemas.openxmlformats.org/spreadsheetml/2006/main}'
+
+        # 方式1: 从 sharedStrings.xml 提取
         try:
             content = zf.read('xl/sharedStrings.xml')
             root = ET.fromstring(content)
-
-            # 提取所有字符串
-            strings = []
-            ns = '{http://schemas.openxmlformats.org/spreadsheetml/2006/main}'
 
             for si in root.iter(f'{ns}si'):
                 text_parts = []
@@ -103,14 +103,44 @@ class XlsxExtractor(BaseExtractor):
                         text_parts.append(t.text)
                 if text_parts:
                     strings.append(''.join(text_parts))
-
-            # 生成指纹
-            combined = '|'.join(sorted(strings))
-            meta.shared_string_hash = hashlib.md5(combined.encode()).hexdigest()
-            meta.extra['string_count'] = len(strings)
-
         except KeyError:
             pass
+
+        # 方式2: 从工作表中提取内联字符串 (inlineStr)
+        try:
+            content = zf.read('xl/workbook.xml')
+            root = ET.fromstring(content)
+
+            # 获取所有工作表
+            for sheet in root.iter(f'{ns}sheet'):
+                sheet_name = sheet.get('name')
+                sheet_id = sheet.get('sheetId')
+
+                # 尝试读取工作表文件
+                sheet_file = f'xl/worksheets/sheet{sheet_id}.xml'
+                if sheet_file in [n for n in zf.namelist()]:
+                    try:
+                        sheet_content = zf.read(sheet_file)
+                        sheet_root = ET.fromstring(sheet_content)
+
+                        # 提取内联字符串
+                        for is_elem in sheet_root.iter(f'{ns}is'):
+                            for t in is_elem.iter(f'{ns}t'):
+                                if t.text:
+                                    strings.append(t.text)
+                    except:
+                        pass
+        except KeyError:
+            pass
+
+        # 生成指纹
+        if strings:
+            combined = '|'.join(sorted(set(strings)))
+            meta.shared_string_hash = hashlib.md5(combined.encode()).hexdigest()
+            meta.extra['string_count'] = len(strings)
+        else:
+            meta.shared_string_hash = None
+            meta.extra['string_count'] = 0
 
     def _extract_style_fingerprint(self, meta: FileMeta, zf: ZipFile):
         """提取样式指纹"""

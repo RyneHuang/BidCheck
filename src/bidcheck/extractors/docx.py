@@ -50,6 +50,9 @@ class DocxExtractor(BaseExtractor):
 
                 # 5. 嵌入图片哈希
                 self._extract_image_hashes(meta, zf)
+
+                # 6. 样式指纹 (styles.xml)
+                self._extract_style_fingerprint(meta, zf)
         except Exception as e:
             meta.extra['error'] = str(e)
 
@@ -144,6 +147,14 @@ class DocxExtractor(BaseExtractor):
                 content = zf.read(name)
                 hashes.append(hashlib.md5(content).hexdigest())
         meta.image_hashes = hashes
+
+    def _extract_style_fingerprint(self, meta: FileMeta, zf: ZipFile):
+        """提取样式指纹"""
+        try:
+            content = zf.read('word/styles.xml')
+            meta.style_fingerprint = hashlib.md5(content).hexdigest()
+        except KeyError:
+            pass
 
     @staticmethod
     def _get_xml_text(root, tag: str, ns: dict) -> Optional[str]:
