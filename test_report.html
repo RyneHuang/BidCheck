@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>围标检测报告 - test_bidding</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 12px; margin-bottom: 20px; }
+        .header h1 { font-size: 24px; margin-bottom: 10px; }
+        .risk-card { background: #E6A23C; color: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; display: flex; align-items: center; gap: 30px; }
+        .risk-score { font-size: 48px; font-weight: bold; }
+        .risk-level { font-size: 24px; }
+        .card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.1); }
+        .card h2 { font-size: 18px; margin-bottom: 15px; color: #303133; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ebeef5; }
+        th { background: #f5f7fa; font-weight: 600; }
+        .badge { background: #409eff; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; }
+        .info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+        .info-item { background: #f5f7fa; padding: 15px; border-radius: 8px; }
+        .info-label { font-size: 12px; color: #909399; margin-bottom: 5px; }
+        .info-value { font-size: 18px; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>围标检测报告</h1>
+            <p>test_bidding</p>
+        </div>
+
+        <div class="risk-card">
+            <div>
+                <div class="risk-score">69.9</div>
+                <div class="risk-level">HIGH</div>
+            </div>
+            <div style="flex: 1;">
+                <div class="info-grid">
+                    <div class="info-item" style="background: rgba(255,255,255,0.2); color: white;">
+                        <div class="info-label" style="color: rgba(255,255,255,0.8);">投标方数量</div>
+                        <div class="info-value">3</div>
+                    </div>
+                    <div class="info-item" style="background: rgba(255,255,255,0.2); color: white;">
+                        <div class="info-label" style="color: rgba(255,255,255,0.8);">发现痕迹</div>
+                        <div class="info-value">3</div>
+                    </div>
+                    <div class="info-item" style="background: rgba(255,255,255,0.2); color: white;">
+                        <div class="info-label" style="color: rgba(255,255,255,0.8);">分析时间</div>
+                        <div class="info-value" style="font-size: 14px;">2026-03-22 08:40:10</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>可疑痕迹详情 (3 条)</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>类型</th>
+                        <th>投标方</th>
+                        <th>匹配值</th>
+                        <th>权重</th>
+                        <th>证据</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+                <tr>
+                    <td><span class="badge">author</span></td>
+                    <td>投标方B ↔ 投标方A</td>
+                    <td>张三</td>
+                    <td>0.45</td>
+                    <td>文档作者相同: 张三</td>
+                </tr>
+            
+
+                <tr>
+                    <td><span class="badge">style_fingerprint</span></td>
+                    <td>投标方B ↔ 投标方A</td>
+                    <td>b872a13c196a5a01</td>
+                    <td>0.82</td>
+                    <td>文档具有相同的样式指纹，可能使用同一模板或由同一人制作</td>
+                </tr>
+            
+
+                <tr>
+                    <td><span class="badge">author</span></td>
+                    <td>投标方B ↔ 投标方A</td>
+                    <td>openpyxl</td>
+                    <td>0.45</td>
+                    <td>文档作者相同: openpyxl</td>
+                </tr>
+            
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

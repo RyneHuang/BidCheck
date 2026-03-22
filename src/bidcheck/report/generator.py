@@ -68,9 +68,10 @@ class ReportGenerator:
             project_name=report.project_name,
             analysis_time=report.analysis_time.strftime('%Y-%m-%d %H:%M:%S'),
             risk_score=report.risk_score,
-            risk_level=report.risk_level,
+            risk_level=report.risk_level.upper(),
             risk_color=self._get_risk_color(report.risk_level),
             bidders=', '.join(report.bidders),
+            bidders_count=len(report.bidders),
             traces_count=len(report.traces),
             traces_table=self._generate_traces_table(report.traces),
             heatmap_json=json.dumps(report.heatmap_data),
@@ -149,7 +150,7 @@ class ReportGenerator:
         <div class="risk-card">
             <div>
                 <div class="risk-score">{risk_score:.1f}</div>
-                <div class="risk-level">{risk_level.upper()}</div>
+                <div class="risk-level">{risk_level}</div>
             </div>
             <div style="flex: 1;">
                 <div class="info-grid">
