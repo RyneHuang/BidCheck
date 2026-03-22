@@ -151,8 +151,18 @@ class DocxExtractor(BaseExtractor):
         # 处理带命名空间的标签
         prefix, local = tag.split(':')
         full_tag = f'{{{ns[prefix]}}}{local}'
+
+        # 首先尝试直接子元素
         elem = root.find(full_tag)
-        return elem.text if elem is not None and elem.text else None
+        if elem is not None and elem.text:
+            return elem.text
+
+        # 如果找不到，尝试在所有子元素中查找
+        for elem in root.iter(full_tag):
+            if elem.text:
+                return elem.text
+
+        return None
 
     @staticmethod
     def _parse_datetime(dt_str: Optional[str]) -> Optional[datetime]:
